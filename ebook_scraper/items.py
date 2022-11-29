@@ -7,7 +7,7 @@ from scrapy import Item, Field
 from itemloaders.processors import MapCompose, TakeFirst
 
 def get_price(txt):
-    return float(txt.replace('£','' ))
+    return float(txt.replace('£', ''))
 
 
 class EbookItem(Item):
@@ -15,6 +15,6 @@ class EbookItem(Item):
         output_processer=TakeFirst()
     )
     price=Field(
-        input_processor=MapCompose(get_price ),
+        input_processor=MapCompose(get_price),
         output_processer=TakeFirst()
     )
