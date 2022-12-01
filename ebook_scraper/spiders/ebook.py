@@ -4,16 +4,30 @@ from scrapy.loader import ItemLoader
 
 class EbookSpider(scrapy.Spider):
     name="ebook"
-    start_urls = ["https://books.toscrape.com/catalogue/category/books/travel_2/"]
-    cols =["Title", "Price"]
+    start_urls = [ "https://books.toscrape.com/catalogue/category/books/travel_2/" ]
 
     def parse(self, response):
         ebooks= response.css("article.product_pod")
 
         for ebook in ebooks:
-            loader = ItemLoader(item=EbookItem(), selector=ebook)
-            loader.add_css('title',"h3 a::attr(title)")
-            loader.add_css('price',"p.price_color::text")
+            url=ebook.css("h3 a").attrib["href"]
 
+            yield scrapy.Request(
+                url = self.start_urls[0] + url,
+                callback = self.parse_details
+            )
+    def parse_details(self, response):
+        main = response.css('div.product_main')
 
-            yield loader.load_item()
+        loader = ItemLoader(item=EbookItem(), selector=main)
+
+        loader.add_css("title", "h1::text")
+        loader.add_css("price", "p.price_color::text")
+
+        quantity_p = main.css("p.availability")
+        loader.add_value(
+            "quantity",
+            quantity_p.re(r'\(.+ available\)')[0]
+        )
+        
+        yield loader.load_item()

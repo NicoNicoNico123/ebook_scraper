@@ -17,7 +17,7 @@ class EbookScraperPipeline:
     # Given generated (yield) item from spider
     def process_item(self, item, spider):
         # Add the title & price value in a new row
-        self.sheet.append(str([ item['title'], item['price'] ]))
+        self.sheet.append([ item['title'], item['price'] ])
         return item
 
     # Called when spider is closed/finished
